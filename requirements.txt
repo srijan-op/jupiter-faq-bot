@@ -1,0 +1,11 @@
+pandas
+chromadb
+sentence-transformers
+uuid
+langchain
+langchain-groq
+streamlit
+python-dotenv
+groq
+langdetect 
+deep-translator
