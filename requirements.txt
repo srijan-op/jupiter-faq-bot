@@ -9,3 +9,4 @@ python-dotenv
 groq
 langdetect 
 deep-translator
+pysqlite3-binary
