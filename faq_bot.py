@@ -1,3 +1,5 @@
+# faq_bot.py
+
 import os
 import logging
 from dotenv import load_dotenv
@@ -117,7 +119,11 @@ Respond in a simple, helpful, and human-like tone."""
     def get_response(self, query: str) -> Dict:
         logger.info(f"User Query: {query}")
 
-        original_lang = detect(query)
+        try:
+            original_lang = detect(query)
+        except:
+            original_lang = 'en' # Default to English if detection fails
+            
         translated_query = self._translate_to_english(query)
 
         if not translated_query.strip():
@@ -129,18 +135,27 @@ Respond in a simple, helpful, and human-like tone."""
             }
 
         relevant_faqs = self.search_faqs(translated_query)
+        
+        # --- FIX FOR RAG BOT ---
+        # If no relevant FAQs are found, the query is off-topic. Return a standard, non-translated response.
         if not relevant_faqs:
-            response_text = "I couldn't find anything specific. Could you rephrase or ask about payments, cards, KYC, etc.?"
-        else:
-            response_text = self.generate_response_with_llm(translated_query, relevant_faqs)
-
+            response_text = "I couldn't find anything specific. Can you please rephrase or find some relevant doubts from the category section? Please contact Jupiter support for more assistance."
+            return {
+                "response": response_text,
+                "confidence": 0.0,
+                "source_faqs": [],
+                "suggestions": self._get_popular_questions()
+            }
+        
+        # --- NORMAL FLOW ---
+        # This part only runs if we found relevant FAQs.
+        response_text = self.generate_response_with_llm(translated_query, relevant_faqs)
         response_text = self._translate_to_original_language(response_text, original_lang)
 
         confidence = relevant_faqs[0][1] if relevant_faqs else 0.0
         top_faq = relevant_faqs[0][0] if relevant_faqs else {}
         main_question = top_faq.get("question", "")
 
-        # 🔁 NEW: Use semantic similarity for suggestions
         suggestions = list(set(
             self._get_similar_questions_from_chroma(translated_query, exclude=main_question) +
             self._get_behavior_based_suggestions()
