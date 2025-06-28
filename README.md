@@ -1,4 +1,6 @@
-# Jupiter FAQ Bot 🤖: A RAG vs. LLM-Only Comparative Analysis
+# Jupiter FAQ Bot 🤖: A RAG based Q&A Bot 
+
+Deployed link : https://jupiter-faq-bot-ons3kklxc5bq63goavcwot.streamlit.app/
 
 This project delivers a comprehensive solution for building and evaluating a conversational FAQ bot based on the Jupiter Help Centre, fulfilling all core and bonus objectives of the assignment.
 
